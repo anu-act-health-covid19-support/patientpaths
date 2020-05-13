@@ -8,17 +8,22 @@ reference-section-title: References
 
 This is a place to sketch out a design for patientpaths to make it maximally
 useful for all the relevant folks. It's not a UML diagram, it's a document for
-humans, although it might get into the implementation details as well.
-
-If you've got questions/suggestions or would like to get in touch, contact
+humans, although it might get into the implementation details as well. If you've
+got questions/suggestions or would like to get in touch, contact
 [Ben](mailto:ben.swift@anu.edu.au).
 
-## Prior art
+# Prior art
+
+## Academic literature
 
 [@aspland2019clinical] is the most up-to-date (academic) survey on what's out
 there in terms of clinical pathway modelling. Most of the projects described
 don't actually release the software, but a few do, and we should track them
 down.
+
+## Software tools
+
+### Stocks & Flows
 
 If we consider this as a more general "stocks and flows" problem, there are
 _lots_ of related software tools for doing this sort of thing. One early
@@ -26,6 +31,12 @@ challenge for this project will be figuring out whether it's worth glomming onto
 one of these existing tools, or starting from scratch.
 
 TODO make a list of such tools.
+
+### Epidemiological models
+
+TODO we should also make a note of other models (e.g. infection models). This
+will be important for making sure that our tool plays nice with the rest of the
+ecosystem (such as it is).
 
 # Users
 
@@ -68,3 +79,11 @@ There are two types of inputs to patientpaths:
   different population strata)
 
 ## Outputs
+
+- **Summary statistics** like deaths, capacity limits, etc.
+
+- **Visualisations** of some of the most important metrics.
+
+- **Full utilisation data** (i.e. a timeseries of the utilisation of each
+  resource on each day) might be handy in some circumstances; especially as
+  inputs to other modelling tools.
