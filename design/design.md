@@ -59,6 +59,42 @@ TODO not sure if this is a separate user group form the admins?
 These are decisionmakers without specific health system expertise, but who
 potentially have oversight into resourcing decisions within the health system.
 
+# People
+
+_because "users" is a bit gauche, and stakeholders is too MBAish_
+
+There are several different groups of people to keep in mind when designing patientpaths:
+
+- **Epidemiologists** are the people who design the models for simulating the
+  spread & impact of disease through the population. They ensure that what the
+  model/simulation _says_ will happen as people get sick, spread the disease,
+  and are cared for by the health system best reflects what will _actually_
+  happen.
+
+- **Hospital administrators** are responsible for configuring patientpaths so
+  that it knows the specific capacities and pathways within their specific
+  health system (because all health systems are different), modelling
+  _different_ configurations of the health system (to see how things might be
+  done differently).
+
+- **Domain-expert policymakers** are people within the health system (i.e.
+  domain experts) who need to make decisions about resource allocation.
+
+- **Non-domain-expert policymakers** are people outside (or "above") the health
+  system who don't necessarily have the specific domain expertise, but who are
+  in charge of making decisions about how resources will be allocated (e.g.
+  politicians).
+
+- **Software engineers** are people who take the models from the epidemiologists
+  and write the software so that they will run reliably and efficiently.
+
+- **UX designers** are people who make sure that the experience of actually
+  using patientpaths (providing inputs, consuming outputs) is a good one.
+
+- **Technical writers** are necessary to make sure that the documentation and
+  scaffolding for this project serves all the above groups and makes it easy for
+  them to do their job and make the most of what patientpaths can do for them.
+
 # Data
 
 ## Inputs
@@ -68,7 +104,13 @@ There are two types of inputs to patientpaths:
 - **Health system topology** inputs are descriptions of the type, capacity and
   pathways through the different resources in the health system. These might be
   detailed, and will take some time to collate for a specific health system
-  context, but probably won't change often.
+  context, but probably won't change often. Within this topology, there are two
+  different types of inputs:
+  - _capacities_, e.g. the number of ICU beds, the number of PPE masks (these
+    are the "stocks", or at least they place upper bounds on the stocks)
+  - _pathways_, e.g. what happens to patients when they get sick? what happens if
+    they get worse? what's the back-up plan if the care resource they need isn't
+    available? (these are the "flows")
 
 - **Infection model** inputs are time series (either real or simulated) of
   presentations of sick people---these are the "inputs" to the health system.
@@ -87,3 +129,34 @@ There are two types of inputs to patientpaths:
 - **Full utilisation data** (i.e. a timeseries of the utilisation of each
   resource on each day) might be handy in some circumstances; especially as
   inputs to other modelling tools.
+
+# Interface notes
+
+There are two main interfaces:
+
+1. the "tell patientpaths what my health system looks like" interface
+
+2. the "what will happen in my health system under this particular disease
+   scenario" interface
+
+Interface #2 is not dissimilar to what we built for the ACT-ANU taskforce MVP;
+it's interface #1 which is completely new (and in some ways is the more
+challenging part of the project, interface-wise).
+
+# Software notes
+
+Priorities:
+
+- no proprietary tools
+
+- no need for complicated statistical/stochastic elements in the "core" model;
+  sampling & estimating distributions can happen one level up the abstraction
+  tree[^stochastic]
+
+- prefer plain text (inc. csv) to bespoke data formats, because the systems this
+  will interact with will probably require those formats for data interchange
+  anyway
+  
+[^stochastic]:
+    there are pros & cons to this; the other option is to go full bayesian
+    (which I'm not closed to) but it's probably better to do one or the other
