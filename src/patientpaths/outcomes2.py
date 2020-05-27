@@ -25,7 +25,6 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
 	num_strata = di_mild.shape[0]
 	num_days = di_mild.shape[1]
 
-
 	#% Mild presentations in each setting.
 	mld_new_GP = np.zeros([num_strata])
 	mld_new_ED = np.zeros([num_strata])
@@ -50,12 +49,6 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
 	#% Daily incidence of severe cases that present early; they will present
 	#% with more severe disease and require hospitalisation.
 	sev_rpt_tmrw = np.zeros([num_strata])
-
-	#% The daily demand for hospitalisation.
-	#% NOTE: this is the presenting severe proportion, ignoring "early" severe
-	#% cases and counting "late" repeat presentations.
-	#% Multiply this by frac_ward_to_ICU to determine the ward/ICU split.
-	req_hosp = np.zeros(di_sev.shape)
 
 	#% Yesterday's (fractional) ward availability.
 	frac_ward_avail = 1
@@ -114,10 +107,7 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
 		yest_sev_rpt_ED[:] = moc.sev_late_to_ED * sev_rpt_tmrw
 		yest_sev_rpt_Clinic[:] = moc.sev_late_to_Clinic * sev_rpt_tmrw
 
-		#% Daily incidence of ED and Clinic cases that require hospitalisation.
-		req_hosp[:, d] = sev_new_late + sev_rpt_late_ED + sev_rpt_late_Clinic
-
-		want_beds, avail_clinic, admit_clinic, excess_clinic, admit_ed, excess_ed, avail_ed = step23(moc,num_strata,sev_rpt_late_Clinic, sev_new_late_Clinic, sev_rpt_late_ED, sev_new_late_ED, frac_ward_avail)
+		want_beds, avail_clinic, admit_clinic_sev, excess_clinic, admit_ed_sev, excess_ed_sev, avail_ed = step23(moc,num_strata,sev_rpt_late_Clinic, sev_new_late_Clinic, sev_rpt_late_ED, sev_new_late_ED, frac_ward_avail)
 
 		try_ward, req_ward, admit_icu, avail_icu, excess_icu, deaths = step4(d, moc, num_days, num_strata, want_beds, risk)
 
@@ -126,7 +116,7 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
 		#% Update the ward availability, which affects tomorrow's ED capacity.
 		frac_ward_avail = avail_ward[d] / moc.cap_Ward
 
-		admit_gp, avail_gp, excess_gp, admit_clinic, avail_clinic, admit_ed, avail_ed, excess_ed, excess_clinic = step6(moc, num_days, num_strata, mld_new_Clinic, mld_rpt_Clinic, mld_new_ED, mld_rpt_ED, mld_new_GP, mld_rpt_GP, admit_clinic, avail_clinic, admit_ed, avail_ed, excess_ed, excess_clinic)
+		admit_gp, avail_gp, excess_gp, admit_clinic_mld, avail_clinic, admit_ed_mld, avail_ed, excess_ed_mld, excess_clinic = step6(moc, num_days, num_strata, mld_new_Clinic, mld_rpt_Clinic, mld_new_ED, mld_rpt_ED, mld_new_GP, mld_rpt_GP, avail_clinic, avail_ed, excess_ed_sev, excess_clinic)
 
 	out = {};
 	#additional outputs of unprocessed data
@@ -134,14 +124,17 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
 
 	out['excess_icu'] = excess_icu;
 	out['excess_ward'] = excess_ward;
-	out['excess_ed'] = excess_ed;
+	out['excess_ed_sev'] = excess_ed_sev;
+	out['excess_ed_mld'] = excess_ed_mld;
 	out['excess_clinic'] = excess_clinic;
 	out['excess_gp'] = excess_gp;
 
 	out['admit_icu'] = admit_icu;
 	out['admit_ward'] = admit_ward;
-	out['admit_ed'] = admit_ed;
-	out['admit_clinic'] = admit_clinic;
+	out['admit_ed_sev'] = admit_ed_sev;
+	out['admit_ed_mld'] = admit_ed_mld;
+	out['admit_clinic_sev'] = admit_clinic_sev;
+	out['admit_clinic_mld'] = admit_clinic_mld;
 	out['admit_gp'] = admit_gp;
 
 	out['avail_icu'] = avail_icu;

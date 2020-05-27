@@ -1,11 +1,6 @@
 import numpy as np
 
 def step5(d, moc, num_days, num_strata, try_ward):
-#input: try_ward
-#local: 
-#output: admit_ward, avail_ward, excess_ward
-
-	#declare locals
 
 	#declare outputs
 	admit_ward = np.zeros([num_strata])

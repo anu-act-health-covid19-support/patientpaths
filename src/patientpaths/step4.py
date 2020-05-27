@@ -1,12 +1,8 @@
 import numpy as np
 
 def step4(d, moc, num_days, num_strata, want_beds, risk):
-#input: want_beds
-#local: cases, req_icu, frac_ward_to_ICU, frac_ICU_to_death, frac_noICU_to_death
-#output: try_ward, req_ward, admit_icu, avail_icu, excess_icu, deaths
 
 	#declare locals
-	cases = np.zeros([1])
 	#% The daily demand for bed occupancy for each strata.
 	req_icu = np.zeros([num_strata])
 	#% Identify cohorts with increased risk of ICU admission and death.
@@ -33,9 +29,8 @@ def step4(d, moc, num_days, num_strata, want_beds, risk):
 	#%
 	for s in range(num_strata):
 		#% Determine who needs ward beds and ICU beds.
-		cases = want_beds[s]
-		req_icu[s] = cases * frac_ward_to_ICU[s]
-		try_ward[s] = cases - req_icu[s]
+		req_icu[s] = want_beds[s] * frac_ward_to_ICU[s]
+		try_ward[s] = want_beds[s] - req_icu[s]
 		req_ward[s] = try_ward[s]
 
 		#% Determine who gets ICU beds.
