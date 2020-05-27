@@ -1,0 +1,36 @@
+digraph graphname {
+	di_mld -> mld_new_GP;
+	di_mld -> mld_new_ED;
+	di_mld -> mld_new_Clinic;
+
+	yest_mld_new_GP -> mld_rpt_ED;
+	yest_mld_new_GP -> mld_rpt_Clinic;
+	yest_mld_new_ED -> mld_rpt_GP;
+	yest_mld_rpt_ED -> mld_rpt_GP;
+	yest_mld_new_Clinic -> mld_rpt_GP;
+	yest_mld_rpt_Clinic -> mld_rpt_GP;
+
+	mld_new_GP -> yest_mld_new_GP;
+	mld_new_ED -> yest_mld_new_ED;
+	mld_new_Clinic -> yest_mld_new_Clinic;
+	mld_rpt_ED -> yest_mld_rpt_ED;
+	mld_rpt_Clinic -> yest_mld_rpt_Clinic;
+
+	di_sev -> sev_new_early;
+	sev_new_early -> sev_new_early_GP;
+	sev_new_early -> sev_new_early_ED;
+	sev_new_early -> sev_new_early_Clinic;
+	di_sev -> sev_new_late;
+	sev_new_late -> sev_new_late_ED;
+	sev_new_late -> sev_new_late_Clinic;
+	yest_sev_rpt_ED -> sev_rpt_late_ED;
+	yest_sev_rpt_Clinic -> sev_rpt_late_Clinic;
+
+	sev_new_early -> sev_rpt_tmrw;
+	sev_rpt_tmrw -> yest_sev_rpt_ED;
+	sev_rpt_tmrw -> yest_sev_rpt_Clinic;
+	sev_new_late -> req_hosp;
+	sev_rpt_late_ED -> req_hosp;
+	sev_rpt_late_Clinic -> req_hosp;
+
+}
