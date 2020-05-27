@@ -30,10 +30,10 @@ def model_of_care(moc_name, ppe_rec, jurisdiction=None):
   else:
     if jurisdiction == 'ACT':
       popn_frac = 426.7 / 25359.7
-      cap_ICU = NaN
-      cap_Ward = NaN
-      cap_ED = NaN
-      cap_GP = NaN
+      cap_ICU = 22
+      cap_Ward = 448
+      cap_ED = 202
+      cap_GP = 2607
     elif jurisdiction == 'NSW':
       popn_frac = 8089.5 / 25359.7
       cap_ICU = NaN
