@@ -1,25 +1,8 @@
-# OUTCOMES_FOR_MOC(moc, di_mild, di_sev, risk, frac_sev, ppe_stop)
-#
-# Calculate the population outcomes and healthcare impact of an nCoV scenario
-# for the provided model of care 'moc'. Other parameters are:
-#
-# - 'di_mild': the daily incidence of mild cases, who will present but will
-#   not require hospitalisation; it should have dimensions [S P D] for S
-#   simulations, P population strata, and D days.
-# - 'di_sev': the daily incidence of severe cases, who will require
-#   hospitalisation; it should have the same dimensions as 'di_mild' (above).
-# - 'risk': a [P 1] column vector that has values > 1 for population strata
-#   that have increased risks of ICU admission and death.
-#See also model_of_care, ppe_usage
+# OUTCOMES_FOR_MOC
 import numpy as np
-import pdb
-
-from step23 import step23
-from step4 import step4
-from step5 import step5
-from step6 import step6
 
 from Presentation_Matrix import Presentation_Matrix
+from components import allocate, allocate_duration
 
 def outcomes_for_moc(moc, di_mild, di_sev, risk):
 
@@ -28,6 +11,17 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
 	num_days = di_mild.shape[1]
 	#% Yesterday's (fractional) ward availability.
 	frac_ward_avail = 1
+	#% Identify cohorts with increased risk of ICU admission and death.
+	frac_ward_to_ICU = moc.ward_to_ICU * np.ones([num_strata])
+	frac_ward_to_ICU[risk > 1] = moc.ward_to_ICU_highrisk
+	frac_ICU_to_death = moc.ICU_to_death * np.ones([num_strata])
+	frac_ICU_to_death[risk > 1] = moc.ICU_to_death_highrisk
+	#% Halve the survival rate for cases that require ICU admission but cannot
+	#% be admitted into an ICU.
+	frac_noICU_to_death = 1 - 0.5 * (1 - frac_ICU_to_death)
+	avail_icu = np.tile(moc.cap_ICU, [num_days])
+	avail_ward = np.tile(moc.cap_Ward, [num_days])
+	deaths = np.zeros([num_strata])
 
 	pres = Presentation_Matrix()
 	pres.set_default(np.zeros([num_strata]))
@@ -55,16 +49,28 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
 		pres['di_sev'] = di_sev[:, d]
 		pres.apply()
 
-		want_beds, avail_clinic, admit_clinic_sev, excess_clinic, admit_ed_sev, excess_ed_sev, avail_ed = step23(moc,num_strata,pres['sev_rpt_late_Clinic'], pres['sev_new_late_Clinic'], pres['sev_rpt_late_ED'], pres['sev_new_late_ED'], frac_ward_avail)
-
-		try_ward, req_ward, admit_icu, avail_icu, excess_icu, deaths = step4(d, moc, num_days, num_strata, want_beds, risk)
-
-		admit_ward, avail_ward, excess_ward = step5(d, moc, num_days, num_strata, try_ward)
-
-		#% Update the ward availability, which affects tomorrow's ED capacity.
+		avail_ed = moc.cap_ED * np.minimum(moc.lm_ED_cap_E1 + (1 - moc.lm_ED_cap_E1) * frac_ward_avail / moc.lm_ED_cap_W0, 1)
+		admit_clinic_sev, excess_clinic_sev, avail_clinic = \
+			allocate(num_strata, pres['sev_rpt_late_Clinic'] + pres['sev_new_late_Clinic'], moc.cap_Clinic)
+		admit_ed_sev, excess_ed_sev, avail_ed = \
+			allocate(num_strata, pres['sev_rpt_late_ED'] + pres['sev_new_late_ED'], moc.cap_ED)
+		req_icu = (pres['admit_clinic_sev'] + pres['admit_ed_sev']) * frac_ward_to_ICU
+		try_ward = (pres['admit_clinic_sev'] + pres['admit_ed_sev']) - req_icu
+		admit_icu,excess_icu = allocate_duration(num_strata,num_days,avail_icu,d,moc.LoS_ICU,req_icu)
+		try_ward = try_ward + excess_icu
+		deaths = admit_icu * frac_ICU_to_death + excess_icu * frac_noICU_to_death
+		admit_ward,excess_ward = allocate_duration(num_strata,num_days,avail_ward,d,moc.LoS_Ward,try_ward)
 		frac_ward_avail = avail_ward[d] / moc.cap_Ward
 
-		admit_gp, avail_gp, excess_gp, admit_clinic_mld, avail_clinic, admit_ed_mld, avail_ed, excess_ed_mld, excess_clinic = step6(moc, num_days, num_strata, pres['mld_new_Clinic'], pres['mld_rpt_Clinic'], pres['mld_new_ED'], pres['mld_rpt_ED'], pres['mld_new_GP'], pres['mld_rpt_GP'], avail_clinic, avail_ed, excess_ed_sev, excess_clinic)
+		admit_clinic_mld, excess_clinic_mld, avail_clinic = \
+			allocate(num_strata, pres['mld_new_Clinic'] + pres['mld_rpt_Clinic'], avail_clinic)
+		admit_ed_mld, excess_ed_mld, avail_ed = \
+			allocate(num_strata, pres['mld_new_ED'] + pres['mld_rpt_ED'], avail_ed)
+		admit_gp, excess_gp, avail_gp = \
+			allocate(num_strata, 
+				pres['mld_new_GP'] + pres['mld_rpt_GP'] + pres['excess_clinic_mld'] + 
+				pres['excess_clinic_sev'] + pres['excess_ed_mld'] + pres['excess_ed_sev'],
+			moc.cap_GP)
 
 	out = {};
 	#additional outputs of unprocessed data
@@ -74,7 +80,8 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
 	out['excess_ward'] = excess_ward;
 	out['excess_ed_sev'] = excess_ed_sev;
 	out['excess_ed_mld'] = excess_ed_mld;
-	out['excess_clinic'] = excess_clinic;
+	out['excess_clinic_mld'] = excess_clinic_mld;
+	out['excess_clinic_sev'] = excess_clinic_sev;
 	out['excess_gp'] = excess_gp;
 
 	out['admit_icu'] = admit_icu;
