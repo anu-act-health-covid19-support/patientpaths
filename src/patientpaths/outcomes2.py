@@ -19,95 +19,43 @@ from step4 import step4
 from step5 import step5
 from step6 import step6
 
+from Presentation_Matrix import Presentation_Matrix
+
 def outcomes_for_moc(moc, di_mild, di_sev, risk):
 
 	#% Define dimensions that affect variable sizes.
 	num_strata = di_mild.shape[0]
 	num_days = di_mild.shape[1]
-
-	#% Mild presentations in each setting.
-	mld_new_GP = np.zeros([num_strata])
-	mld_new_ED = np.zeros([num_strata])
-	mld_new_Clinic = np.zeros([num_strata])
-	mld_rpt_GP = np.zeros([num_strata])
-	mld_rpt_ED = np.zeros([num_strata])
-	mld_rpt_Clinic = np.zeros([num_strata])
-
-	#% Severe presentations in each setting.
-	sev_new_early = np.zeros([num_strata])
-	sev_new_early_GP = np.zeros([num_strata])
-	sev_new_early_ED = np.zeros([num_strata])
-	sev_new_early_Clinic = np.zeros([num_strata])
-	#% Daily incidence of severe cases that present late in each setting.
-	sev_new_late = np.zeros([num_strata])
-	sev_new_late_ED = np.zeros([num_strata])
-	sev_new_late_Clinic = np.zeros([num_strata])
-	#% Daily incidence of repeat severe cases that present in each setting.
-	sev_rpt_late_ED = np.zeros([num_strata])
-	sev_rpt_late_Clinic = np.zeros([num_strata])
-
-	#% Daily incidence of severe cases that present early; they will present
-	#% with more severe disease and require hospitalisation.
-	sev_rpt_tmrw = np.zeros([num_strata])
-
 	#% Yesterday's (fractional) ward availability.
 	frac_ward_avail = 1
 
-	#% Yesterday's presentations, used to calculate repeat presentation.
-	yest_mld_new_GP = np.zeros([num_strata])
-	yest_mld_new_ED = np.zeros([num_strata])
-	yest_mld_new_Clinic = np.zeros([num_strata])
-	yest_mld_rpt_ED = np.zeros([num_strata])
-	yest_mld_rpt_Clinic = np.zeros([num_strata])
-	#% Early severe presentations that will still require hospitalisation.
-	yest_sev_rpt_ED = np.zeros([num_strata])
-	yest_sev_rpt_Clinic = np.zeros([num_strata])
+	pres = Presentation_Matrix()
+	pres.set_default(np.zeros([num_strata]))
+	pres.transition("di_mild","mld_new_GP",moc.mild_to_GP)
+	pres.transition("di_mild","mld_new_ED",moc.mild_to_ED)
+	pres.transition("di_mild","mld_new_Clinic",moc.mild_to_Clinic)
+	pres.transition("mld_new_GP","mld_rpt_ED",moc.mild_GP_rpt_ED)
+	pres.transition("mld_new_GP","mld_rpt_Clinic",moc.mild_GP_rpt_Clinic)
+	pres.transition("mld_new_ED","mld_rpt_GP",moc.mild_ED_rpt_GP)
+	pres.transition("mld_rpt_ED","mld_rpt_GP",moc.mild_ED_rpt_GP)
+	pres.transition("mld_new_Clinic","mld_rpt_GP",moc.mild_Clinic_rpt_GP)
+	pres.transition("mld_rpt_Clinic","mld_rpt_GP",moc.mild_Clinic_rpt_GP)
+	pres.transition("di_sev","sev_new_early",moc.sev_frac_early)
+	pres.transition("di_sev","sev_new_early_GP",moc.sev_frac_early * moc.sev_early_to_GP)
+	pres.transition("di_sev","sev_new_early_ED",moc.sev_frac_early * moc.sev_early_to_ED)
+	pres.transition("di_sev","sev_new_early_Clinic",moc.sev_frac_early * moc.sev_early_to_Clinic)
+	pres.transition("di_sev","sev_new_late",moc.sev_frac_late)
+	pres.transition("di_sev","sev_new_late_ED",moc.sev_frac_late * moc.sev_late_to_ED)
+	pres.transition("di_sev","sev_new_late_Clinic",moc.sev_frac_late * moc.sev_late_to_Clinic)
+	pres.transition("sev_new_early","sev_rpt_late_ED",moc.sev_late_to_ED)
+	pres.transition("sev_new_early","yest_sev_rpt_Clinic",moc.sev_late_to_Clinic)
 
 	for d in range(num_days):
+		pres['di_mild'] = di_mild[:, d]
+		pres['di_sev'] = di_sev[:, d]
+		pres.apply()
 
-		#%
-		#% Step 1: Daily presentations in each setting.
-		#%
-
-		#% Daily incidence of new mild cases in each setting.
-		mld_new_GP[:] = moc.mild_to_GP * di_mild[:, d]
-		mld_new_ED[:] = moc.mild_to_ED * di_mild[:, d]
-		mld_new_Clinic[:] = moc.mild_to_Clinic * di_mild[:, d]
-		#% Daily incidence of repeat mild cases in each setting.
-		mld_rpt_ED[:] = moc.mild_GP_rpt_ED * yest_mld_new_GP
-		mld_rpt_Clinic[:] = moc.mild_GP_rpt_Clinic * yest_mld_new_GP
-		mld_rpt_GP[:] = moc.mild_ED_rpt_GP * (yest_mld_new_ED + yest_mld_rpt_ED) + moc.mild_Clinic_rpt_GP * (yest_mld_new_Clinic + yest_mld_rpt_Clinic)
-		#% Record these presentations for use tomorrow.
-		yest_mld_new_GP[:] = mld_new_GP
-		yest_mld_new_ED[:] = mld_new_ED
-		yest_mld_new_Clinic[:] = mld_new_Clinic
-		yest_mld_rpt_ED[:] = mld_rpt_ED
-		yest_mld_rpt_Clinic[:] = mld_rpt_Clinic
-
-		#% Daily incidence of severe cases that present early in each setting.
-		sev_new_early[:] = moc.sev_frac_early * di_sev[:, d]
-		sev_new_early_GP[:] = moc.sev_early_to_GP * sev_new_early
-		sev_new_early_ED[:] = moc.sev_early_to_ED * sev_new_early
-		sev_new_early_Clinic[:] = moc.sev_early_to_Clinic * sev_new_early
-		#% Daily incidence of severe cases that present late in each setting.
-		sev_new_late[:] = moc.sev_frac_late * di_sev[:, d]
-		sev_new_late_ED[:] = moc.sev_late_to_ED * sev_new_late
-		sev_new_late_Clinic[:] = moc.sev_late_to_Clinic * sev_new_late
-		#% Daily incidence of repeat severe cases that require hospitalisation.
-		sev_rpt_late_ED[:] = yest_sev_rpt_ED
-		sev_rpt_late_Clinic[:] = yest_sev_rpt_Clinic
-
-		#%
-		#% Step 1a: Determine what number of severe cases that present early will
-		#%          require hospitalisation **tomorrow**.
-		#%
-
-		#% Daily incidence of repeat severe cases in EDs and Clinics.
-		sev_rpt_tmrw[:] = sev_new_early
-		yest_sev_rpt_ED[:] = moc.sev_late_to_ED * sev_rpt_tmrw
-		yest_sev_rpt_Clinic[:] = moc.sev_late_to_Clinic * sev_rpt_tmrw
-
-		want_beds, avail_clinic, admit_clinic_sev, excess_clinic, admit_ed_sev, excess_ed_sev, avail_ed = step23(moc,num_strata,sev_rpt_late_Clinic, sev_new_late_Clinic, sev_rpt_late_ED, sev_new_late_ED, frac_ward_avail)
+		want_beds, avail_clinic, admit_clinic_sev, excess_clinic, admit_ed_sev, excess_ed_sev, avail_ed = step23(moc,num_strata,pres['sev_rpt_late_Clinic'], pres['sev_new_late_Clinic'], pres['sev_rpt_late_ED'], pres['sev_new_late_ED'], frac_ward_avail)
 
 		try_ward, req_ward, admit_icu, avail_icu, excess_icu, deaths = step4(d, moc, num_days, num_strata, want_beds, risk)
 
@@ -116,7 +64,7 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
 		#% Update the ward availability, which affects tomorrow's ED capacity.
 		frac_ward_avail = avail_ward[d] / moc.cap_Ward
 
-		admit_gp, avail_gp, excess_gp, admit_clinic_mld, avail_clinic, admit_ed_mld, avail_ed, excess_ed_mld, excess_clinic = step6(moc, num_days, num_strata, mld_new_Clinic, mld_rpt_Clinic, mld_new_ED, mld_rpt_ED, mld_new_GP, mld_rpt_GP, avail_clinic, avail_ed, excess_ed_sev, excess_clinic)
+		admit_gp, avail_gp, excess_gp, admit_clinic_mld, avail_clinic, admit_ed_mld, avail_ed, excess_ed_mld, excess_clinic = step6(moc, num_days, num_strata, pres['mld_new_Clinic'], pres['mld_rpt_Clinic'], pres['mld_new_ED'], pres['mld_rpt_ED'], pres['mld_new_GP'], pres['mld_rpt_GP'], avail_clinic, avail_ed, excess_ed_sev, excess_clinic)
 
 	out = {};
 	#additional outputs of unprocessed data
