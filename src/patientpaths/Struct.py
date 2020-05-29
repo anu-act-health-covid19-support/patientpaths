@@ -1,4 +1,3 @@
-
 # from : https://goodcode.io/articles/python-dict-object/
 class Struct(dict):
     def __getattr__(self, name):
