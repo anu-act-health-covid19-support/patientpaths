@@ -1,4 +1,4 @@
-#% MODEL_OF_CARE(moc_name, ppe_rec, jurisdiction)
+# MODEL_OF_CARE(moc_name, ppe_rec, jurisdiction)
 #
 # Returns the model of care parameters that characterise each healthcare
 # setting, for the given model of care ('default', 'cohort', 'clinics',
@@ -7,8 +7,8 @@
 # By default, this returns national capacities. To use jurisdiction capacities
 # specify one of 'ACT', 'NSW', 'NT', 'QLD', 'SA', 'TAS', 'VIC', 'WA'.
 #
-from ppe_usage import ppe_usage
-from Struct import Struct
+from .ppe_usage import ppe_usage
+from .Struct import Struct
 
 
 def model_of_care(moc_name, ppe_rec, jurisdiction=None):
@@ -20,9 +20,9 @@ def model_of_care(moc_name, ppe_rec, jurisdiction=None):
     national_ED = NaN
     national_GP = NaN
 
-    #% NOTE: define the model of care capacities for the specified jurisdiction.
+    # NOTE: define the model of care capacities for the specified jurisdiction.
     if jurisdiction is None:
-        #% Default to national capacity.
+        # Default to national capacity.
         jurisdiction = "National"
         popn_frac = 1.0
         cap_ICU = national_ICU
@@ -148,7 +148,7 @@ def model_of_care(moc_name, ppe_rec, jurisdiction=None):
         # This service will consume PPE; assume that the background rate is
         # *HALF* that of GPs.
         moc.ppe_usage.daily_bg_Clinic = moc.ppe_usage.daily_bg_GP * 0.1 * 0.5
-        moc_pp_usage.daily_case_Clinic = moc.ppe_usage.daily_case_GP
+        moc.ppe_usage.daily_case_Clinic = moc.ppe_usage.daily_case_GP
         # Redirect cases that use this service as per the ED rate.
         moc.mild_Clinic_rpt_GP = moc.mild_ED_rpt_GP
         # Redirect GP cases to this service, as well as to the EDs.
@@ -188,5 +188,5 @@ def model_of_care(moc_name, ppe_rec, jurisdiction=None):
         # NOTE: adjust the jurisdiction overhead consumption.
         ppe.daily_bg_Clinic = ppe.daily_bg_Clinic * moc.popn_frac
     else:
-        raise Exception("Unknown model of care: {}.".format(name))
+        raise NotImplementedError(f"Unknown model of care {moc_name!r}")
     return [Struct(moc)]

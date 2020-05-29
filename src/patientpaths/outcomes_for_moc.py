@@ -1,21 +1,22 @@
 # OUTCOMES_FOR_MOC
 import numpy as np
-from components import allocate, allocate_duration
-from Presentation_Matrix import Presentation_Matrix
+
+from .components import allocate, allocate_duration
+from .Presentation_Matrix import Presentation_Matrix
 
 
 def outcomes_for_moc(moc, di_mild, di_sev, risk):
-    #% Define dimensions that affect variable sizes.
+    # Define dimensions that affect variable sizes.
     num_strata = di_mild.shape[0]
     num_days = di_mild.shape[1]
 
-    #% Identify cohorts with increased risk of ICU admission and death.
+    # Identify cohorts with increased risk of ICU admission and death.
     frac_ward_to_ICU = moc.ward_to_ICU * np.ones([num_strata])
     frac_ward_to_ICU[risk > 1] = moc.ward_to_ICU_highrisk
     frac_ICU_to_death = moc.ICU_to_death * np.ones([num_strata])
     frac_ICU_to_death[risk > 1] = moc.ICU_to_death_highrisk
-    #% Halve the survival rate for cases that require ICU admission but cannot
-    #% be admitted into an ICU.
+    # Halve the survival rate for cases that require ICU admission but cannot
+    # be admitted into an ICU.
     frac_noICU_to_death = 1 - 0.5 * (1 - frac_ICU_to_death)
     # misc stuff
     frac_ward_avail = 1

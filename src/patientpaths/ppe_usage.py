@@ -1,22 +1,22 @@
-#%% PPE_USAGE(moc_name, ppe_rec)
-#%
-#% Returns the background and per-patient PPE rates in each healthcare setting,
-#% for the given model of care ('default', 'cohort', 'clinics', 'phone') and
-#% PPE recommendations ('moderate', 'high').
-#%
-from Struct import Struct
+# PPE_USAGE(moc_name, ppe_rec)
+#
+# Returns the background and per-patient PPE rates in each healthcare setting,
+# for the given model of care ('default', 'cohort', 'clinics', 'phone') and
+# PPE recommendations ('moderate', 'high').
+#
+from .Struct import Struct
 
 
 def ppe_usage(moc_name, ppe_rec):
     NaN = float("NaN")
-    #% Define the PPE usage as per the moderate-use recommendations.
+    # Define the PPE usage as per the moderate-use recommendations.
     if ppe_rec == "moderate":
         ppe_bg_icu = NaN
         if moc_name == "cohort":
             ppe_bg_ward = NaN
         else:
             ppe_bg_ward = NaN
-        ppe_bg_ed = NaN  #% NOTE: not affected by cohorting.
+        ppe_bg_ed = NaN  # NOTE: not affected by cohorting.
         ppe_bg_gp = NaN
         if moc_name == "clinics":
             ppe_bg_clinic = NaN
@@ -29,11 +29,11 @@ def ppe_usage(moc_name, ppe_rec):
         if moc_name == "clinics":
             ppe_case_clinic = NaN
         else:
-            #% NOTE: the phone/online model uses the clinic setting to track
-            #% consultations, but uses no PPE in doing so.
+            # NOTE: the phone/online model uses the clinic setting to track
+            # consultations, but uses no PPE in doing so.
             ppe_case_clinic = 0
 
-        #% P2 mask consumption (per-patient only, no overheads).
+        # P2 mask consumption (per-patient only, no overheads).
         p2_case_icu = NaN
         p2_case_ward = NaN
         p2_case_ed = NaN
@@ -47,7 +47,7 @@ def ppe_usage(moc_name, ppe_rec):
             p2_case_clinic = 0
             p2_case_clinic_severe = 0
 
-    #% Define the PPE usage as per the high-use recommendations.
+    # Define the PPE usage as per the high-use recommendations.
     elif ppe_rec == "high":
         ppe_bg_icu = NaN
         if moc_name == "cohort":
@@ -63,18 +63,18 @@ def ppe_usage(moc_name, ppe_rec):
         else:
             ppe_bg_clinic = 0
 
-        ppe_case_icu = 0  #% NOTE: assumption is *all patients* are wearing
-        ppe_case_ward = 0  #% surgical masks; only need the background rate.
+        ppe_case_icu = 0  # NOTE: assumption is *all patients* are wearing
+        ppe_case_ward = 0  # surgical masks; only need the background rate.
         ppe_case_ed = NaN
         ppe_case_gp = NaN
         if moc_name == "clinics":
             ppe_case_clinic = NaN
         else:
-            #% NOTE: the phone/online model uses the clinic setting to track
-            #% consultations, but uses no PPE in doing so.
+            # NOTE: the phone/online model uses the clinic setting to track
+            # consultations, but uses no PPE in doing so.
             ppe_case_clinic = 0
 
-        #% P2 mask consumption (per-patient only, no overheads).
+        # P2 mask consumption (per-patient only, no overheads).
         p2_case_icu = NaN
         p2_case_ward = NaN
         p2_case_ed = NaN
@@ -90,7 +90,7 @@ def ppe_usage(moc_name, ppe_rec):
     else:
         raise Exception("Invalid PPE recommendations: {}.".format(ppe_rec))
 
-    #% Return the PPE usage parameters.
+    # Return the PPE usage parameters.
     usage = {
         "recommendation": ppe_rec,
         "daily_bg_ICU": ppe_bg_icu,
