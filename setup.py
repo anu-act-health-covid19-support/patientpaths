@@ -16,10 +16,6 @@ with open(local_file("src/patientpaths/__init__.py")) as o:
         if line.startswith("__version__"):
             _, __version__, _ = line.split('"')
 
-install_requires = [
-    "xarray>=0.15.1",
-]
-
 setuptools.setup(
     name="patientpaths",
     version=__version__,
@@ -30,8 +26,9 @@ setuptools.setup(
     package_data={"": ["py.typed"]},
     url="https://github.com/anu-act-health-covid19-support/patientpaths",
     license="GPLv3",
+    entry_points={"console_scripts": ["patientpaths = patientpaths.run:main"]},
     description="",  # TODO
-    install_requires=install_requires,
+    install_requires=["numpy"],
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 3 - Alpha",

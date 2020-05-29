@@ -4,12 +4,4 @@
 #
 #    pip-compile --output-file=deps/run.txt setup.py
 #
-numpy==1.18.4             # via pandas, xarray
-pandas==1.0.3             # via xarray
-python-dateutil==2.8.1    # via pandas
-pytz==2020.1              # via pandas
-six==1.15.0               # via python-dateutil
-xarray==0.15.1            # via patientpaths (setup.py)
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
+numpy==1.18.4             # via patientpaths (setup.py)
