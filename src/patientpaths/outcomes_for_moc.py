@@ -106,25 +106,25 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
             moc.cap_GP,
         )
 
-    out = {}
-    out["deaths"] = deaths
-    out["excess_icu"] = excess_icu
-    out["excess_ward"] = excess_ward
-    out["excess_ed_sev"] = excess_ed_sev
-    out["excess_ed_mld"] = excess_ed_mld
-    out["excess_clinic_mld"] = excess_clinic_mld
-    out["excess_clinic_sev"] = excess_clinic_sev
-    out["excess_gp"] = excess_gp
-    out["admit_icu"] = admit_icu
-    out["admit_ward"] = admit_ward
-    out["admit_ed_sev"] = admit_ed_sev
-    out["admit_ed_mld"] = admit_ed_mld
-    out["admit_clinic_sev"] = admit_clinic_sev
-    out["admit_clinic_mld"] = admit_clinic_mld
-    out["admit_gp"] = admit_gp
-    out["avail_icu"] = avail_icu
-    out["avail_ward"] = avail_ward
-    out["avail_ed"] = avail_ed
-    out["avail_clinic"] = avail_clinic
-    out["avail_gp"] = avail_gp
-    return out
+    return {
+        "deaths": deaths,
+        "excess_icu": excess_icu,
+        "excess_ward": excess_ward,
+        "excess_ed_sev": excess_ed_sev,
+        "excess_ed_mld": excess_ed_mld,
+        "excess_clinic_mld": excess_clinic_mld,
+        "excess_clinic_sev": excess_clinic_sev,
+        "excess_gp": excess_gp,
+        "admit_icu": admit_icu,
+        "admit_ward": admit_ward,
+        "admit_ed_sev": admit_ed_sev,
+        "admit_ed_mld": admit_ed_mld,
+        "admit_clinic_sev": admit_clinic_sev,
+        "admit_clinic_mld": admit_clinic_mld,
+        "admit_gp": admit_gp,
+        "avail_icu": avail_icu,
+        "avail_ward": avail_ward,
+        "avail_ed": avail_ed,
+        "avail_clinic": avail_clinic,
+        "avail_gp": avail_gp,
+    }

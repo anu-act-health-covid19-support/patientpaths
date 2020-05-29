@@ -112,5 +112,4 @@ def ppe_usage(moc_name, ppe_rec):
         "p2_case_clinic": p2_case_clinic,
         "p2_case_clinic_severe": p2_case_clinic_severe,
     }
-    usage = Struct(usage)
-    return usage
+    return Struct(usage)

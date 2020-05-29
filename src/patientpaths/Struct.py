@@ -1,4 +1,7 @@
 # from : https://goodcode.io/articles/python-dict-object/
+#
+# TODO: can this be replaced by the standard-library?  See
+# https://docs.python.org/3/library/types.html#types.SimpleNamespace
 class Struct(dict):
     def __getattr__(self, name):
         if name in self:
