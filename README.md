@@ -15,7 +15,7 @@ bed_ → _ward bed_ (recovery) → _discharge_.
 
 ## Features
 
-- no proprietary software required (just Python 3 with
+- no proprietary software required (just Python v3.6+ with
   [NumPy](https://numpy.org))
 
 - modular (consumes input data & provides output results in
