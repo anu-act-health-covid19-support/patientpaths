@@ -2,6 +2,12 @@
 
 ![PatientPaths CI](https://github.com/anu-act-health-covid19-support/patientpaths/workflows/PatientPaths%20CI/badge.svg)
 
+> **NOTE**: `patientpaths` is currently under active development (pre-alpha
+> quality software). So if you've got suggestions/feedback on the
+> design---especially if you work in healthcare and have a need for this sort of
+> modelling---then please do get in touch, but be wary that it's not yet ready
+> for clinical use.
+
 `patientpaths` is an open and accessible Python toolkit for clinical pathway
 modelling.
 
