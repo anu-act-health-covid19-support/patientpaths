@@ -1,4 +1,4 @@
-# PatientPaths
+# PatientPaths ![PatientPaths CI](https://github.com/anu-act-health-covid19-support/patientpaths/workflows/PatientPaths%20CI/badge.svg)
 
 `patientpaths` is an open and accessible Python toolkit for clinical pathway
 modelling. **If** you have
