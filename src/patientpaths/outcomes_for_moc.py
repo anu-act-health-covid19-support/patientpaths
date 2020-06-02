@@ -53,7 +53,7 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
     pres.transition("sev_new_early", "sev_rpt_late_ED", moc.sev_late_to_ED)
 
     output_data = {}
-	for s in ["deaths","excess_icu","excess_ward","excess_ed_sev","excess_ed_mld","excess_clinic_mld","excess_clinic_sev","excess_gp","admit_icu","admit_ward","admit_ed_sev","admit_ed_mld","admit_clinic_sev","admit_clinic_mld","admit_gp","avail_ed","avail_clinic","avail_gp"]:
+    for s in ["deaths","excess_icu","excess_ward","excess_ed_sev","excess_ed_mld","excess_clinic_mld","excess_clinic_sev","excess_gp","admit_icu","admit_ward","admit_ed_sev","admit_ed_mld","admit_clinic_sev","admit_clinic_mld","admit_gp","avail_ed","avail_clinic","avail_gp"]:
         output_data[s] = []
 
     for d in range(num_days):
