@@ -22,7 +22,6 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
     frac_ward_avail = 1
     avail_icu = np.tile(moc.cap_ICU, [num_days])
     avail_ward = np.tile(moc.cap_Ward, [num_days])
-    deaths = np.zeros([num_strata])
 
     # construct the matrix calculating what presentations appear before the healthsystem
     pres = Presentation_Matrix()
@@ -52,7 +51,10 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
         "di_sev", "sev_new_late_Clinic", moc.sev_frac_late * moc.sev_late_to_Clinic
     )
     pres.transition("sev_new_early", "sev_rpt_late_ED", moc.sev_late_to_ED)
-    pres.transition("sev_new_early", "yest_sev_rpt_Clinic", moc.sev_late_to_Clinic)
+
+    output_data = {}
+	for s in ["deaths","excess_icu","excess_ward","excess_ed_sev","excess_ed_mld","excess_clinic_mld","excess_clinic_sev","excess_gp","admit_icu","admit_ward","admit_ed_sev","admit_ed_mld","admit_clinic_sev","admit_clinic_mld","admit_gp","avail_ed","avail_clinic","avail_gp"]:
+        output_data[s] = []
 
     for d in range(num_days):
         # Daily presentations in each setting. (steps1 and steps1a)
@@ -106,25 +108,25 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
             moc.cap_GP,
         )
 
-    return {
-        "deaths": deaths,
-        "excess_icu": excess_icu,
-        "excess_ward": excess_ward,
-        "excess_ed_sev": excess_ed_sev,
-        "excess_ed_mld": excess_ed_mld,
-        "excess_clinic_mld": excess_clinic_mld,
-        "excess_clinic_sev": excess_clinic_sev,
-        "excess_gp": excess_gp,
-        "admit_icu": admit_icu,
-        "admit_ward": admit_ward,
-        "admit_ed_sev": admit_ed_sev,
-        "admit_ed_mld": admit_ed_mld,
-        "admit_clinic_sev": admit_clinic_sev,
-        "admit_clinic_mld": admit_clinic_mld,
-        "admit_gp": admit_gp,
-        "avail_icu": avail_icu,
-        "avail_ward": avail_ward,
-        "avail_ed": avail_ed,
-        "avail_clinic": avail_clinic,
-        "avail_gp": avail_gp,
-    }
+        output_data["deaths"].append(deaths)
+        output_data["excess_icu"].append(excess_icu)
+        output_data["excess_ward"].append(excess_ward)
+        output_data["excess_ed_sev"].append(excess_ed_sev)
+        output_data["excess_ed_mld"].append(excess_ed_mld)
+        output_data["excess_clinic_mld"].append(excess_clinic_mld)
+        output_data["excess_clinic_sev"].append(excess_clinic_sev)
+        output_data["excess_gp"].append(excess_gp)
+        output_data["admit_icu"].append(admit_icu)
+        output_data["admit_ward"].append(admit_ward)
+        output_data["admit_ed_sev"].append(admit_ed_sev)
+        output_data["admit_ed_mld"].append(admit_ed_mld)
+        output_data["admit_clinic_sev"].append(admit_clinic_sev)
+        output_data["admit_clinic_mld"].append(admit_clinic_mld)
+        output_data["admit_gp"].append(admit_gp)
+        output_data["avail_ed"].append(avail_ed)
+        output_data["avail_clinic"].append(avail_clinic)
+        output_data["avail_gp"].append(avail_gp)
+    output_data['avail_icu'] = avail_icu
+    output_data['avail_ward'] = avail_ward
+
+    return output_data

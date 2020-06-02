@@ -1,0 +1,38 @@
+Outcomes_for_moc python reimplementation README
+-----------------------------------------------
+
+The following sourcecode is a python reimplementation of Outcomes_for_moc.m of the patent paths matlab simulation library
+particularly there is a lot of simplification (removing redundant variables and structures) and reorganisation.
+
+The first and most notable feature of the simplification is that it no longer takes multiple simulations as inputs together, and hence for multiple simulation runs the function must be called multiple times. this reduces the dimensionality of the input variables by one.
+
+There are three primary components of the simplification that reduce the complexity of the matlab code
+
+Summary of Changes:
+-------------------
+
+* A Presentation Matrix component:
+
+In the previous matlab implementation, in Step1 a series of variables were assigned at the beginninng of each day of simulation by series of assignments additions and multiplications by constants, these included:
+(mld_new_GP, mld_new_ED, mld_new_Clinic, mld_rpt_ED, mld_rpt_Clinic, mld_rpt_GP, yest_mld_new_GP, yest_mld_new_ED, yest_mld_new_Clinic, yest_mld_rpt_ED, yest_mld_rpt_Clinic, sev_new_early, sev_new_early_GP, sev_new_early_ED, sev_new_early_Clinic, sev_new_late, sev_new_late_ED, sev_new_late_Clinic, sev_rpt_late_ED, sev_rpt_late_Clinic, sev_rpt_tmrw, yest_sev_rpt_ED, yest_sev_rpt_Clinic, req_hosp)
+It was noticed that all of these could be factored as being a multiplication by a matrix.
+Furthermore many of the yest_ variables could tacitly be removed as they simply stored the variables of the previous day for assignment on the next day.
+
+The PresentationMatrix python class, simply takes as input each of the column/row constants entries (or transitions) by labeled pair column/row, and prior to an multiplying input vector are set the elements of the vector, and then apply() is called, and the resulting vector is read out.
+
+* an allocate function
+
+Many of the lines of the original outcomes_for_moc.m are instances of allocation process repeated, which can be factored as a single function call allocate() called 5 unique times.
+the allocate function takes as input a demand vector (by strata), and an integer capacity, and returns the vector of admissions (by strata) the excess vector (by strata) and the integer capacity remaining.
+
+* an allocate_duration function
+
+Similar to the Allocate function except allocating over a duration of days (eg ICU beds), particularly it takes input a demand vector (over strata) and an availability vector (over days), if there is availability on the day ('d') for a particular patient demand, it allocates the patient and decrements the availability over a length-of-stay of days.
+It returns the allocated number of demand patients, and excess.
+
+How to Use:
+-----------
+
+If you want to change the structure of presentations to the healthcare system, alter the transitions input into the PresentationMatrix
+Alternatively if you want to change the way the patients are handled through the clinical pathway, you need to change the code surrounding the calls to allocate and allocate_duration functions - as these represent the handling of the patient allocations through the clinical process.
+The variables created in and among these allocation function calls are subsequently output from the function in the final lines, any additional variables can be added as needed.
