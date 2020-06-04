@@ -145,7 +145,7 @@ challenging part of the project, interface-wise).
 
 # Software notes
 
-Priorities:
+Our priorities are:
 
 - no proprietary tools
 
