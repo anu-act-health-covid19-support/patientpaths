@@ -24,18 +24,26 @@ class allocate(PatientPathsComponent):
         else:
             capacity = self.capacity
         for s in range(len(values[self._demand])):
-            admit_value = min(capacity, values[self._demand][s])
+            admit_value = min(capacity, float(values[self._demand][s]))
             admit[s] = admit_value
             excess[s] = values[self._demand][s] - admit_value
             capacity = capacity - admit_value
             if admit_value > 0:
                 for i in range(self.length_of_stay):
                     if len(static[self.buffer_name]) <= i:
-                        static[self.buffer_name].append([admit_value])
+                        static[self.buffer_name].append(admit_value)
                     else:
                         static[self.buffer_name][i] += admit_value
         values[self._admit] = admit
         values[self._excess] = excess
+
+class pop_buffer(PatientPathsComponent):
+    def __init__(self, buffer_name):
+        self.buffer_name = buffer_name
+
+    def apply(self, values, static):
+        if len(static[self.buffer_name]) > 0:
+            static[self.buffer_name] = static[self.buffer_name][1:]
 
 
 class transfer(PatientPathsComponent):

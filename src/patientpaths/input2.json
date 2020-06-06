@@ -54,6 +54,10 @@
 			{"type":"transfer","parameters":{"_to":"severe_icu_recovered", "_from":[["severe_icu_recovered", 0.9]]}},
 			{"type":"transfer","parameters":{"_to":"severe_ward_recovered", "_from":[["severe_ward_recovered", 0.8]]}},
 			{"type":"transfer","parameters":{"_to":"mild_ward_recovered", "_from":[["mild_ward_recovered", 0.9]]}}
+		],
+		[
+			{"type":"pop_buffer","parameters":{"buffer_name":"icu_buffer"}},
+			{"type":"pop_buffer","parameters":{"buffer_name":"ward_buffer"}}
 		]
 	]
 }
