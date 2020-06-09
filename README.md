@@ -39,7 +39,12 @@ bed_ → _ward bed_ (recovery) → _discharge_.
 
 ## Setup
 
-TODO
+`pip install .` will install the `patientpaths` executable in your Python
+environment, along with all the dependencies (`numpy`).
+
+If you are using a linux or OSX computer which ships with a very old version
+of Python, like the past-end-of-life Python 2, you may need to use `pip3` or
+another distribution-specific install command.
 
 ## Using `patientpaths`
 
