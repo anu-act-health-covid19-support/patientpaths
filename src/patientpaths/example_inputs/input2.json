@@ -1,0 +1,25 @@
+{
+	"title":"a test patientflows",
+	"author":"bill bobson",
+	"date":"22/02/2020",
+	"note":"A SIR model with two part infectious system, with a 7 infectious period pre symptomatic period and then exponential decay after onset of symptoms",
+	"num_days":60,
+	"poles": [
+		{"name":"susceptible","initial_value":999},
+		{"name":"new_infectious","initial_value":1},
+		{"name":"symptomatic","initial_value":0}
+	],
+	"components":[
+		{"kind":"transfer","parameters":{"_to":"symptomatic", "_from":[["symptomatic",0.90]]}},
+		{"kind":"queue","parameters":{"_to":"symptomatic","_from":"new_infectious","_queued":"infectious_queued","size":7}},
+		{"kind":"transfer","parameters":{"_to":"new_infectious","_from":[
+			["susceptible","infectious_queued",0.0001], 
+			["susceptible","symptomatic",0.0001]
+		]}},
+		{"kind":"transfer","parameters":{"_to":"susceptible","_from":[
+			["susceptible"],
+			["susceptible","infectious_queued",-0.0001], 
+			["susceptible","symptomatic",-0.0001]
+		]}}
+	]
+}

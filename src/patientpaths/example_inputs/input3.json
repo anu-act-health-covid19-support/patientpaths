@@ -1,0 +1,34 @@
+{
+	"title":"a test patientflows2",
+	"author":"job jillson",
+	"date":"22/02/2020",
+	"note":"A SIR model with a two stage hospitalisation pathway",
+	"num_days":30,
+	"poles": [
+		{"name":"susceptible","initial_value":999},
+		{"name":"infectious","initial_value":1},
+		{"name":"symptomatic","initial_value":0},
+		{"name":"population_profile","initial_value":[0.1,0.1,0.2,0.2,0.4]}
+	],
+	"components":[
+		{"kind":"transfer","parameters":{"_to":"symptomatic", "_from":[
+			["infectious",0.05]
+		]}},
+		{"kind":"transfer","parameters":{"_to":"infectious","_from":[
+			["infectious",0.95],
+			["susceptible","infectious",0.0005], 
+			["susceptible","symptomatic",0.0005]
+		]}},
+		{"kind":"transfer","parameters":{"_to":"susceptible","_from":[
+			["susceptible"],
+			["susceptible","infectious",-0.0005], 
+			["susceptible","symptomatic",-0.0005]
+		]}},
+		{"kind":"transfer","parameters":{"_to":"symptomatic_vector", "_from":[
+			["symptomatic","population_profile"]
+		]}},
+		{"kind":"allocate","parameters":{"length_of_stay":8,"capacity":60,"_demand":"symptomatic_vector","_admit":"hospitalisation_stage1_admit","_excess":"symptomatic_excess","buffer_name":"stage1_buffer"}},
+		{"kind":"allocate","parameters":{"length_of_stay":12,"capacity":90,"_demand":"symptomatic_excess","_admit":"hospitalisation_stage2_admit","_excess":"symptomatic_double_excess","buffer_name":"stage2_buffer"}},
+		{"kind":"sum_vector","parameters":{"_from":"symptomatic_double_excess","_to":"symptomatic"}}
+	]
+}

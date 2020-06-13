@@ -1,0 +1,28 @@
+{
+	"title":"a test patientflows3",
+	"author":"mick jackson",
+	"date":"22/02/2020",
+	"note":"A really simple SEIR model",
+	"num_days":60,
+	"poles": [
+		{"name":"susceptible","initial_value":999},
+		{"name":"infectious","initial_value":1},
+		{"name":"symptomatic","initial_value":0}
+	],
+	"components":[
+		{"kind":"transfer","parameters":{"_to":"symptomatic", "_from":[
+			["symptomatic"],
+			["infectious",0.05]
+		]}},
+		{"kind":"transfer","parameters":{"_to":"infectious","_from":[
+			["infectious",0.95],
+			["susceptible","infectious",0.0005], 
+			["susceptible","symptomatic",0.0005]
+		]}},
+		{"kind":"transfer","parameters":{"_to":"susceptible","_from":[
+			["susceptible"],
+			["susceptible","infectious",-0.0005], 
+			["susceptible","symptomatic",-0.0005]
+		]}}
+	]
+}

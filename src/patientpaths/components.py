@@ -2,10 +2,20 @@ import numpy as np
 
 
 class PatientPathsComponent(object):
-    pass
+    inputs = []
+    outputs = []
+
+    def apply(self, values, static):
+        raise Exception("Component unimplemented error - apply function")
+
+    def finalise(self, values, static):
+        raise Exception("Component unimplemented error - finalise function")
 
 
 class allocate(PatientPathsComponent):
+    inputs = ["_demand"]
+    outputs = ["_admit", "_excess"]
+
     def __init__(self, length_of_stay, capacity, _demand, _admit, _excess, buffer_name):
         self.length_of_stay = length_of_stay
         self.capacity = capacity
@@ -17,6 +27,8 @@ class allocate(PatientPathsComponent):
     def apply(self, values, static):
         if self.buffer_name not in static.keys():
             static[self.buffer_name] = []
+        while (len(static[self.buffer_name]) > 0) and (static[self.buffer_name][0] < 0):
+            static[self.buffer_name] = static[self.buffer_name][1:]
         admit = values[self._demand] * 0
         excess = values[self._demand] * 0
         if len(static[self.buffer_name]) > 0:
@@ -37,16 +49,30 @@ class allocate(PatientPathsComponent):
         values[self._admit] = admit
         values[self._excess] = excess
 
-class pop_buffer(PatientPathsComponent):
-    def __init__(self, buffer_name):
-        self.buffer_name = buffer_name
+    def finalise(self, values, static):
+        if len(static[self.buffer_name]) > 0:
+            static[self.buffer_name][0] = -1
+
+
+class sum_vector(PatientPathsComponent):
+    inputs = ["_from"]
+    outputs = ["_to"]
+
+    def __init__(self, _to, _from):
+        self._to = _to
+        self._from = _from
 
     def apply(self, values, static):
-        if len(static[self.buffer_name]) > 0:
-            static[self.buffer_name] = static[self.buffer_name][1:]
+        values[self._to] = np.sum(values[self._from])
+
+    def finalise(self, values, static):
+        pass
 
 
 class transfer(PatientPathsComponent):
+    inputs = ["_from"]
+    outputs = ["_to"]
+
     def __init__(self, _to, _from):
         self._to = _to
         self._from = _from
@@ -63,23 +89,14 @@ class transfer(PatientPathsComponent):
             s += m
         values[self._to] = s
 
-
-class init_value(PatientPathsComponent):
-    def __init__(self, _to, value):
-        self._to = _to
-        self.value = value
-        self.applied = False
-
-    def apply(self, values, static):
-        if not self.applied:
-            if isinstance(self.value, list):
-                values[self._to] = np.array(self.value)
-            else:
-                values[self._to] = self.value
-            self.applied = True
+    def finalise(self, values, static):
+        pass
 
 
 class queue(PatientPathsComponent):
+    inputs = ["_from"]
+    outputs = ["_to", "_queued"]
+
     def __init__(self, _to, _from, _queued, size):
         self._to = _to
         self._from = _from
@@ -96,3 +113,6 @@ class queue(PatientPathsComponent):
             self.buffer[i] = self.buffer[i - 1]
         self.buffer[0] = values[self._from]
         values[self._queued] = np.sum([b for b in self.buffer if b is not None])
+
+    def finalise(self, values, static):
+        pass

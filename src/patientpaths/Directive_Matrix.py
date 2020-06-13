@@ -1,19 +1,24 @@
-from components import PatientPathsComponent
+from .components import PatientPathsComponent
 
 
 class ValueList:
     values = None
     update_values = None
+    poles = None
 
-    def __init__(self):
+    def __init__(self, poles):
         self.values = {}
         self.update_values = {}
+        self.poles = poles
 
     def __setitem__(self, label, value):
-        if label not in self.update_values.keys():
-            self.update_values[label] = value
+        if label in self.poles:
+            if label not in self.update_values.keys():
+                self.update_values[label] = value
+            else:
+                self.update_values[label] += value
         else:
-            self.update_values[label] += value
+            self.values[label] = value
 
     def __getitem__(self, label):
         if label not in self.values.keys():
@@ -34,23 +39,21 @@ class Directive_Matrix:
     values = None
     static_dict = None
 
-    def __init__(self):
+    def __init__(self, poles):
         self.component_classes = {
             component.__name__: component
             for component in PatientPathsComponent.__subclasses__()
         }
         self.components = []
-        self.values = ValueList()
+        self.values = ValueList(poles)
         self.static_dict = {}
 
-    def add_component(self, name, stage, parameters):
-        while len(self.components) <= stage:
-            self.components.append([])
-        self.components[stage].append(self.component_classes[name](**parameters))
+    def add_component(self, kind, parameters):
+        self.components.append(self.component_classes[kind](**parameters))
 
     def apply(self):
-        for stage, components in enumerate(self.components):
-            for c in components:
-                c.apply(self.values, self.static_dict)
-            self.values.apply()
-            # print("\tstage {}: {}".format(stage,self.values.values))
+        for c in self.components:
+            c.apply(self.values, self.static_dict)
+        self.values.apply()
+        for c in self.components:
+            c.finalise(self.values, self.static_dict)
