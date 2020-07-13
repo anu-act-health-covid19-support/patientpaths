@@ -1,18 +1,15 @@
-# MODEL_OF_CARE(moc_name, ppe_rec, jurisdiction)
+# MODEL_OF_CARE(moc_name, jurisdiction)
 #
 # Returns the model of care parameters that characterise each healthcare
 # setting, for the given model of care ('default', 'cohort', 'clinics',
-# 'phone') and PPE recommendations ('moderate', 'high').
+# 'phone').
 #
 # By default, this returns national capacities. To use jurisdiction capacities
 # specify one of 'ACT', 'NSW', 'NT', 'QLD', 'SA', 'TAS', 'VIC', 'WA'.
 #
-from .ppe_usage import ppe_usage
-from .Struct import Struct
+from types import SimpleNamespace
 
-
-def model_of_care(moc_name, ppe_rec, jurisdiction=None):
-    ppe = ppe_usage(moc_name, ppe_rec)
+def model_of_care(moc_name, jurisdiction=None):
     NaN = float("NaN")
 
     national_ICU = NaN
@@ -81,46 +78,40 @@ def model_of_care(moc_name, ppe_rec, jurisdiction=None):
         else:
             raise Exception("Unknown jurisdiction: {}.".format(jurisdiction))
 
-        # NOTE: scale the PPE overheads by the capacity fractions.
-        ppe.daily_bg_ICU = ppe.daily_bg_ICU * cap_ICU / national_ICU
-        ppe.daily_bg_Ward = ppe.daily_bg_Ward * cap_Ward / national_Ward
-        ppe.daily_bg_ED = ppe.daily_bg_ED * cap_ED / national_ED
-        ppe.daily_bg_GP = ppe.daily_bg_GP * cap_GP / national_GP
-
     # Define the default model of care parameters; no cohorting, no clinics.
-    moc = {
-        "model_of_care": moc_name,
-        "ppe_usage": ppe,
-        "jurisdiction": jurisdiction,
-        "popn_frac": popn_frac,
-        "cap_Clinic": 0,
-        "cap_GP": cap_GP,
-        "cap_ED": cap_ED,
-        "cap_Ward": cap_Ward,
-        "cap_ICU": cap_ICU,
-        "mild_to_GP": 0.8,
-        "mild_to_ED": 0.2,
-        "mild_to_Clinic": 0.0,
-        "mild_GP_rpt_ED": 0.1,
-        "mild_GP_rpt_Clinic": 0.0,
-        "mild_ED_rpt_GP": 0.05,
-        "mild_Clinic_rpt_GP": 0.0,
-        "sev_frac_early": 0.5,
-        "sev_frac_late": 0.5,
-        "sev_early_to_GP": 0.8,
-        "sev_early_to_ED": 0.2,
-        "sev_early_to_Clinic": 0.0,
-        "sev_late_to_ED": 1.0,
-        "sev_late_to_Clinic": 0.0,
-        "ward_to_ICU": 0.125,
-        "ward_to_ICU_highrisk": 0.250,
-        "ICU_to_death": 0.4,
-        "ICU_to_death_highrisk": 0.6,
-        "LoS_ICU": 10,
-        "LoS_Ward": 5,
-        "lm_ED_cap_W0": 0.2,
-        "lm_ED_cap_E1": 0.1,
-    }
+    moc = SimpleNamespace()
+
+    moc.model_of_care = moc_name
+    moc.jurisdiction = jurisdiction
+    moc.popn_frac = popn_frac
+    moc.cap_Clinic = 0
+    moc.cap_GP = cap_GP
+    moc.cap_ED = cap_ED
+    moc.cap_Ward = cap_Ward
+    moc.cap_ICU = cap_ICU
+    moc.mild_to_GP = 0.8
+    moc.mild_to_ED = 0.2
+    moc.mild_to_Clinic = 0.0
+    moc.mild_GP_rpt_ED = 0.1
+    moc.mild_GP_rpt_Clinic = 0.0
+    moc.mild_ED_rpt_GP = 0.05
+    moc.mild_Clinic_rpt_GP = 0.0
+    moc.sev_frac_early = 0.5
+    moc.sev_frac_late = 0.5
+    moc.sev_early_to_GP = 0.8
+    moc.sev_early_to_ED = 0.2
+    moc.sev_early_to_Clinic = 0.0
+    moc.sev_late_to_ED = 1.0
+    moc.sev_late_to_Clinic = 0.0
+    moc.ward_to_ICU = 0.125
+    moc.ward_to_ICU_highrisk = 0.250
+    moc.ICU_to_death = 0.4
+    moc.ICU_to_death_highrisk = 0.6
+    moc.LoS_ICU = 10
+    moc.LoS_Ward = 5
+    moc.lm_ED_cap_W0 = 0.2
+    moc.lm_ED_cap_E1 = 0.1
+
     # NOTE: lm_ED_cap_W0 and lm_ED_cap_E1 are used to calculate the effective
     # ED consultation capacity, given ward bed utilisation.
     # If ward availability is W0 or higher, the ED effective capacity is 100%.
@@ -131,24 +122,17 @@ def model_of_care(moc_name, ppe_rec, jurisdiction=None):
         # Nothing more to do.
         pass
     elif moc_name == "cohort":
-        # Nothing more to do, only affects PPE usage.
+        # Nothing more to do.
         pass
     elif moc_name == "clinics":
         # NOTE: use 10% of the ED and GP staff, at twice the efficacy.
         moc.cap_Clinic = 2 * 0.1 * (moc.cap_GP + moc.cap_ED)
         moc.cap_GP = 0.9 * moc.cap_GP
         moc.cap_ED = 0.9 * moc.cap_ED
-        # Reduce background PPE consumption in EDs and GPs accordingly.
-        moc.ppe_usage.daily_bg_GP = 0.9 * moc.ppe_usage.daily_bg_GP
-        moc.ppe_usage.daily_bg_Ward = 0.9 * moc.ppe_usage.daily_bg_Ward
         # Redirect 25% of mild cases to this service.
         moc.mild_to_Clinic = 0.25
         moc.mild_to_GP = 0.75 * moc.mild_to_GP
         moc.mild_to_ED = 0.75 * moc.mild_to_ED
-        # This service will consume PPE; assume that the background rate is
-        # *HALF* that of GPs.
-        moc.ppe_usage.daily_bg_Clinic = moc.ppe_usage.daily_bg_GP * 0.1 * 0.5
-        moc.ppe_usage.daily_case_Clinic = moc.ppe_usage.daily_case_GP
         # Redirect cases that use this service as per the ED rate.
         moc.mild_Clinic_rpt_GP = moc.mild_ED_rpt_GP
         # Redirect GP cases to this service, as well as to the EDs.
@@ -161,13 +145,7 @@ def model_of_care(moc_name, ppe_rec, jurisdiction=None):
         # Redirect 50% of late severe cases to this service.
         moc.sev_late_to_ED = 0.5 * moc.sev_late_to_ED
         moc.sev_late_to_Clinic = moc.sev_late_to_ED
-        # NOTE: adjust the jurisdiction overhead consumption.
-        ppe.daily_bg_Clinic = (
-            ppe.daily_bg_Clinic * (cap_ED + cap_GP) / (national_ED + national_GP)
-        )
     elif moc_name == "phone":
-        # NOTE: all-hours phone consultations; does not consume PPE, nor does
-        # it affect PPE usage in other settings.
         moc.cap_Clinic = 100000 * moc.popn_frac
         # Redirect 25% of mild cases to this service.
         moc.mild_to_Clinic = 0.25
@@ -185,8 +163,6 @@ def model_of_care(moc_name, ppe_rec, jurisdiction=None):
         # Redirect 50% of late severe cases to this service.
         moc.sev_late_to_ED = 0.5 * moc.sev_late_to_ED
         moc.sev_late_to_Clinic = moc.sev_late_to_ED
-        # NOTE: adjust the jurisdiction overhead consumption.
-        ppe.daily_bg_Clinic = ppe.daily_bg_Clinic * moc.popn_frac
     else:
-        raise NotImplementedError(f"Unknown model of care {moc_name!r}")
-    return [Struct(moc)]
+        raise NotImplementedError("Unknown model of care")
+    return moc

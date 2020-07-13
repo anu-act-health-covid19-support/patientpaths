@@ -1,11 +1,33 @@
 # OUTCOMES_FOR_MOC
-import numpy as np
 
+# run a pathways simulation for presenting cases (mild and severe) in cohorts (S) across days a number of days (D)
+# a partial python reimplimentation (and simplification) of the Matlab code provided
+# inputs are:
+#    * moc: a string identifying the model of care profile name specified in model_of_care.py
+#           either: 'default','cohort','clinics','phone'
+#    * di_mild: a numpy array of dimension [S, D], identifying mild cases presenting to the clinical pathway of strata (S) per day (D)
+#    * di_sev: a nunpy array of dimension [S, D], identifying severe cases presenting to the clinical pathway per day (must be of same dimension as di_mild)
+#    * risk: a one dimensional numpy array [S], which is a number for each cohort, which if greater than one identifies the cohort as being 'at risk' with slightly different dynamics.
+#
+# Outputs include a range of arrays identifying different factors per day of the simulation, including:
+#  * deaths: number of deaths from each of the cohorts across days of the simulation
+#  * excess_{icu,ward,ed_sev,ed_mld,clinic_mld,clinic_sev,gp}: the vectors of numbers not admitted to each of the services on a given day
+#  * admit_{icu,ward,ed_sev,ed_mld,clinic_mld,clinic_sev,gp}: the vectors of numbers admitted to each of the services on a given day
+#  * avail_{ed,clinic,gp,icu,ward}: the numbers of unused capacity of each of the resources on a given day
+#
+# the pathway described by the code is a reimplementation of MATLAB code developed for modelling Australian Covid spread, originally
+# modified from the pathway described by paper:
+# Robert Moss, James M. McCaw, Allen C. Cheng, Aeron C. Hurt, and Jodie McVernon. Reducing disease burden in an influenza pandemic by targeted delivery of neuraminidase inhibitors: mathematical models in the Australian context. BMC Infectious Diseases, 16(1):552, October 2016. ISSN 1471-2334, doi:10.1186/s12879-016-1866-7.
+
+import numpy as np
 from .components import allocate, allocate_duration
 from .Presentation_Matrix import Presentation_Matrix
+from .model_of_care import model_of_care
 
 
 def outcomes_for_moc(moc, di_mild, di_sev, risk):
+    # get the model_of_care from the moc string
+    moc = model_of_care(moc, 'ACT')
     # Define dimensions that affect variable sizes.
     num_strata = di_mild.shape[0]
     num_days = di_mild.shape[1]
@@ -52,6 +74,7 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
     )
     pres.transition("sev_new_early", "sev_rpt_late_ED", moc.sev_late_to_ED)
 
+    # create the output_data container with appropriate fields
     output_data = {}
     for s in [
         "deaths",
@@ -127,6 +150,7 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
             moc.cap_GP,
         )
 
+        # populate the output container fields for this day
         output_data["deaths"].append(deaths)
         output_data["excess_icu"].append(excess_icu)
         output_data["excess_ward"].append(excess_ward)
@@ -146,6 +170,7 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
         output_data["avail_clinic"].append(avail_clinic)
         output_data["avail_gp"].append(avail_gp)
 
+    # availability vectors are across time anyways, so append them at the end of the simulation
     output_data["avail_icu"] = avail_icu
     output_data["avail_ward"] = avail_ward
 

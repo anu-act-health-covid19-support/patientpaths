@@ -1,3 +1,8 @@
+# Essentially defines a matrix operation
+# matrix terms are added via the transition function, and values are set by __setitem__ function
+# when apply() is called, all the terms are multiplied and added together to get new values given by __getitem__ function
+
+
 class Presentation_Matrix:
     values = None
     multipliers = None
