@@ -120,8 +120,8 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
             num_strata, pres["sev_rpt_late_ED"] + pres["sev_new_late_ED"], moc.cap_ED
         )
         # Hospital admissions -- how many can we put in ICU beds? (step4)
-        req_icu = (pres["admit_clinic_sev"] + pres["admit_ed_sev"]) * frac_ward_to_ICU
-        try_ward = (pres["admit_clinic_sev"] + pres["admit_ed_sev"]) - req_icu
+        req_icu = (admit_clinic_sev + admit_ed_sev) * frac_ward_to_ICU
+        try_ward = (admit_clinic_sev + admit_ed_sev) - req_icu
         admit_icu, excess_icu = allocate_duration(
             num_strata, num_days, avail_icu, d, moc.LoS_ICU, req_icu
         )

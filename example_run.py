@@ -16,35 +16,19 @@ di_sev = np.array([
 [0, 9, 1, 2, 7, 4, 4, 8, 10, 8, 5, 10, 1, 13, 8, 4, 5, 6, 6, 14, 14, 2, 13, 4, 6, 6, 5, 1, 8, 8, 0, 10, 13, 3, 5, 11]
 ])
 
-# for  cohorts1, the mild presentations per day
-di_mild = np.array([
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ], 
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ], 
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ], 
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ]
-])
-# for  cohorts1, the sever presentations per day
-di_sev = np.array([
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ], 
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ], 
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ], 
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ]
-])
+di_mild *= 10
+di_sev *= 7
 
 # cohorts 2 and 3 at risk
 risk = np.array([0, 2, 2, 0])
 
 cohorts = di_mild.shape[0]
 days = di_mild.shape[1]
-
-
-import pdb
-pdb.set_trace()
 outcome = outcomes_for_moc("cohort", di_mild, di_sev, risk)
 
-
-
-
+print("DEATHS PER COHORT")
+print("\t".join([str(i) for i in range(1,cohorts+1)]))
+print('-'*50)
 for i in range(days):
-	print(list(outcome['deaths'][i]))
+	print("\t".join([str(a) for a in list(outcome['deaths'][i].round(decimals=2))]))
 
