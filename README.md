@@ -19,7 +19,7 @@ modelling.
 2. one (or more) forecasts of the number of infections you're expecting in the
    population (e.g. the outputs from an infection model based on local data)
 
-**then** `patientpaths` can simulate the flow of these patients through your
+**then** `patientpaths` can be modified to simulate the flow of these patients through your
 health system, e.g. _presentation at emergency department_ → _ward bed_ → _ICU
 bed_ → _ward bed_ (recovery) → _discharge_.
 
@@ -28,8 +28,7 @@ bed_ → _ward bed_ (recovery) → _discharge_.
 - no proprietary software required (just Python v3.6+ with
   [NumPy](https://numpy.org))
 
-- modular (consumes input data & provides output results in
-  [JSON](https://www.json.org/json-en.html) format for easy integration with
+- modular (consumes input data & provides output for easy python integration with
   other tools)
 
 - highly customisable for the specific capacities & pathways within your health
@@ -48,7 +47,9 @@ another distribution-specific install command.
 
 ## Using `patientpaths`
 
-TODO
+modify the model_of_care.py file with the numerical parameters of your healthcare system, and adjust as needed the 
+elements of your healthcare pathway and their interconnections via code in outcomes_for_moc.py file.
+execute example_run.py for a quick demonstration run of the software.
 
 ## Licence
 
