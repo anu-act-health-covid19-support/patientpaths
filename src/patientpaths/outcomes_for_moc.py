@@ -27,7 +27,7 @@ from .model_of_care import model_of_care
 
 def outcomes_for_moc(moc, di_mild, di_sev, risk):
     # get the model_of_care from the moc string
-    moc = model_of_care(moc, 'ACT')
+    moc = model_of_care(moc, "ACT")
     # Define dimensions that affect variable sizes.
     num_strata = di_mild.shape[0]
     num_days = di_mild.shape[1]

@@ -9,6 +9,7 @@
 #
 from types import SimpleNamespace
 
+
 def model_of_care(moc_name, jurisdiction=None):
     NaN = float("NaN")
 

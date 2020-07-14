@@ -2,6 +2,7 @@
 # matrix terms are added via the transition function, and values are set by __setitem__ function
 # when apply() is called, all the terms are multiplied and added together to get new values given by __getitem__ function
 
+
 class Presentation_Matrix:
     values = None
     multipliers = None
@@ -28,7 +29,7 @@ class Presentation_Matrix:
         return self.values.get(label, self.default.copy())
 
     def apply(self):
-        old_values = {a:b.copy() for a,b in self.values.items()}
+        old_values = {a: b.copy() for a, b in self.values.items()}
         for key in self.values.keys():
             self.values[key] = self.default.copy()
         for from_label in self.multipliers.keys():
