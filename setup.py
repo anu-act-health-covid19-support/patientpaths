@@ -26,7 +26,8 @@ setuptools.setup(
     package_data={"": ["py.typed"]},
     url="https://github.com/anu-act-health-covid19-support/patientpaths",
     license="GPLv3",
-    entry_points={"console_scripts": ["patientpaths = patientpaths.run:main"]},
+    # TODO: un-comment this part once we have a CLI function to execute again.
+    # entry_points={"console_scripts": ["patientpaths = patientpaths.run:main"]},
     description="",  # TODO
     install_requires=["numpy"],
     python_requires=">=3.6",
