@@ -20,9 +20,10 @@
 # Robert Moss, James M. McCaw, Allen C. Cheng, Aeron C. Hurt, and Jodie McVernon. Reducing disease burden in an influenza pandemic by targeted delivery of neuraminidase inhibitors: mathematical models in the Australian context. BMC Infectious Diseases, 16(1):552, October 2016. ISSN 1471-2334, doi:10.1186/s12879-016-1866-7.
 
 import numpy as np
+
 from .components import allocate, allocate_duration
-from .Presentation_Matrix import Presentation_Matrix
 from .model_of_care import model_of_care
+from .Presentation_Matrix import Presentation_Matrix
 
 
 def outcomes_for_moc(moc, di_mild, di_sev, risk):

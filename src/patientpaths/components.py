@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # for a resource of a given capacity, and a demand vector from each of the cohorts
 # allocate the resources to the demand in order, returning how many are admitted to the resource
 # as a vector and the excess vector, and the new capacity
