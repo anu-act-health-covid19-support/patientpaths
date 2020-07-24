@@ -71,6 +71,7 @@ The resources are:
 The specific pathway described by the code is a reimplementation of MATLAB code developed for modelling Australian Covid spread, originally modified from the pathway described by paper:
 > Robert Moss, James M. McCaw, Allen C. Cheng, Aeron C. Hurt, and Jodie McVernon. "Reducing disease burden in an influenza pandemic by targeted delivery of neuraminidase inhibitors: mathematical models in the Australian context." BMC Infectious Diseases, 16(1):552, October 2016. ISSN 1471-2334, doi:10.1186/s12879-016-1866-7.
 
+The short code should be mostly self explanatory, between the code in outcomes_for_moc.py, the two functions in the components.py and the Presentation_Matrix.py class is the entirity of the functi
 
 ## Licence
 
