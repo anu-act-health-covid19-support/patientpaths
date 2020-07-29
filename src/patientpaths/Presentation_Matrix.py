@@ -34,8 +34,6 @@ class Presentation_Matrix:
             self.values[key] = self.default.copy()
         for from_label in self.multipliers.keys():
             for to_label in self.multipliers[from_label].keys():
-                if from_label not in old_values.keys():
-                    raise Exception("presentation matrix trying to access unset data")
                 self.values[to_label] += (
                     self.multipliers[from_label][to_label] * old_values[from_label]
                 )

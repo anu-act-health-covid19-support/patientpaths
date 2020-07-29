@@ -1,12 +1,13 @@
 import numpy as np
 
 from patientpaths import outcomes_for_moc
+from patientpaths.model_of_care import model_of_care
 
 # fmt:off
 # flake8: noqa: E241  # ignore multiple spaces
 
 # Daily Incidence of MILD cases
-di_mild = np.array(
+di_mild = 10 * np.array(
     [
         [10, 10, 15, 15, 18, 21, 24, 32, 33, 30, 39, 36, 31, 26, 15, 11,  8,  4, 13, 14, 10, 16, 20, 20, 15, 24, 28, 26, 23, 19, 21, 14, 17,  5, 13, 12],
         [ 8, 20, 17, 16, 19, 20, 19, 22, 20, 30, 28, 22, 18, 11,  7,  5,  3,  2,  9, 12, 10, 17, 12, 21, 15, 22, 16, 22, 14, 12, 14, 10,  9,  8,  6,  4],
@@ -15,7 +16,7 @@ di_mild = np.array(
     ]
 )
 # Daily Incidence of SEVere cases
-di_sev = np.array(
+di_sev = 7 * np.array(
     [
         [ 8,  0,  7,  6, 5, 2, 2,  4, 12,  4,  9,  1,  9,  4,  6,  3, 11,  1,  2, 12, 10,  6, 13,  4,  7, 3, 10, 10, 12, 11,  8, 12, 12, 10, 1,  6],
         [12,  8,  9, 15, 8, 8, 9, 10,  8, 11, 15,  9, 13, 17, 15, 10,  2, 10,  9, 13, 11, 14, 13, 12,  9, 6,  7,  8, 16,  9,  9,  5,  9, 12, 7,  3],
@@ -25,16 +26,13 @@ di_sev = np.array(
 )
 # fmt:on
 
-# Multiply the incidence numbers by constant factors
-di_mild *= 10
-di_sev *= 7
-
 # cohorts 2 and 3 at risk
 risk = np.array([0, 2, 2, 0])
 
 cohorts = di_mild.shape[0]
 days = di_mild.shape[1]
-outcome = outcomes_for_moc("cohort", di_mild, di_sev, risk)
+moc = model_of_care("cohort", "ACT")
+outcome = outcomes_for_moc(moc, di_mild, di_sev, risk)
 
 print("DEATHS PER COHORT")
 print("\t".join(f"c={i + 1}" for i in range(cohorts)))

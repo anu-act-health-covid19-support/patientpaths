@@ -22,13 +22,10 @@
 import numpy as np
 
 from .components import allocate, allocate_duration
-from .model_of_care import model_of_care
 from .Presentation_Matrix import Presentation_Matrix
 
 
 def outcomes_for_moc(moc, di_mild, di_sev, risk):
-    # get the model_of_care from the moc string
-    moc = model_of_care(moc, "ACT")
     # Define dimensions that affect variable sizes.
     num_strata = di_mild.shape[0]
     num_days = di_mild.shape[1]
@@ -76,28 +73,29 @@ def outcomes_for_moc(moc, di_mild, di_sev, risk):
     pres.transition("sev_new_early", "sev_rpt_late_ED", moc.sev_late_to_ED)
 
     # create the output_data container with appropriate fields
-    output_data = {}
-    for s in [
-        "deaths",
-        "excess_icu",
-        "excess_ward",
-        "excess_ed_sev",
-        "excess_ed_mld",
-        "excess_clinic_mld",
-        "excess_clinic_sev",
-        "excess_gp",
-        "admit_icu",
-        "admit_ward",
-        "admit_ed_sev",
-        "admit_ed_mld",
-        "admit_clinic_sev",
-        "admit_clinic_mld",
-        "admit_gp",
-        "avail_ed",
-        "avail_clinic",
-        "avail_gp",
-    ]:
-        output_data[s] = []
+    output_data = {
+        s: []
+        for s in [
+            "deaths",
+            "excess_icu",
+            "excess_ward",
+            "excess_ed_sev",
+            "excess_ed_mld",
+            "excess_clinic_mld",
+            "excess_clinic_sev",
+            "excess_gp",
+            "admit_icu",
+            "admit_ward",
+            "admit_ed_sev",
+            "admit_ed_mld",
+            "admit_clinic_sev",
+            "admit_clinic_mld",
+            "admit_gp",
+            "avail_ed",
+            "avail_clinic",
+            "avail_gp",
+        ]
+    }
 
     for d in range(num_days):
         # Daily presentations in each setting. (steps1 and steps1a)
